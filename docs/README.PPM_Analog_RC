@@ -1,0 +1,11 @@
+This is the PPM_Analog_RC-write-a-block package meant as a guide to building
+out-of-tree packages. To use the PPM_Analog_RC blocks, the Python namespaces
+is in 'PPM_Analog_RC', which is imported as:
+
+    import PPM_Analog_RC
+
+See the Doxygen documentation for details about the blocks available
+in this package. A quick listing of the details can be found in Python
+after importing by using:
+
+    help(PPM_Analog_RC)

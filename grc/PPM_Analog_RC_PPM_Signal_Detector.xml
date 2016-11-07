@@ -1,0 +1,26 @@
+<block>
+  <name>Ppm signal detector</name>
+  <key>PPM_Analog_RC_PPM_Signal_Detector</key>
+  <category>PPM_ANALOG_RC</category>
+  <import>import PPM_Analog_RC</import>
+  <make>PPM_Analog_RC.PPM_Signal_Detector($samp_rate, $energy_threshold)</make>
+  <param>
+    <name>Samp_rate</name>
+    <key>samp_rate</key>
+    <type>float</type>
+  </param>
+  <param>
+    <name>Energy_threshold</name>
+    <key>energy_threshold</key>
+    <type>float</type>
+  </param>
+  <sink>
+    <name>in</name>
+    <type>float</type>
+    <nports>2</nports>
+  </sink>
+  <source>
+    <name>out</name>
+    <type>float</type>
+  </source>
+</block>

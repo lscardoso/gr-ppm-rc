@@ -1,0 +1,7 @@
+/*!
+ * \defgroup block GNU Radio PPM_ANALOG_RC C++ Signal Processing Blocks
+ * \brief All C++ blocks that can be used from the PPM_ANALOG_RC GNU Radio
+ *        module are listed here or in the subcategories below.
+ *
+ */
+
