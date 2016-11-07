@@ -1,5 +1,5 @@
 <block>
-  <name>PPM Modulator</name>
+  <name>PPM modulator</name>
   <key>PPM_Analog_RC_PPM_Modulator</key>
   <category>PPM_ANALOG_RC</category>
   <import>import PPM_Analog_RC</import>
