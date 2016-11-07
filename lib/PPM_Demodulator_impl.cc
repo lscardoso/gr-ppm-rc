@@ -1,6 +1,7 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+#include <stdio.h>
 #include <gnuradio/io_signature.h>
 #include "PPM_Demodulator_impl.h"
 
