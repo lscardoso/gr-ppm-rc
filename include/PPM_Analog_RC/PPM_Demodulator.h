@@ -49,6 +49,8 @@ namespace gr {
       static sptr make(float samp_rate, int demod_on);
 
       virtual void set_demod_on(int new_state) = 0;
+      virtual float* get_channels() = 0;
+      virtual int get_nbr_channels() = 0;
     };
 
   } // namespace PPM_Analog_RC

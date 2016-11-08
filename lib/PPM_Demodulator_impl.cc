@@ -58,8 +58,11 @@ namespace gr {
       const float *in = (const float *) input_items[0];
       float *out = (float *) output_items[0];
 
-      if(d_demod_on==1){
-        for(int i = 0; i < noutput_items; i++){
+
+
+      for(int i = 0; i < noutput_items; i++){
+          if(d_demod_on==1){
+
           switch(d_state){
 
 
@@ -67,9 +70,11 @@ namespace gr {
             case DETECTION:
               // PEAK DETECTED
               if(in[i] > 0){
+
                 d_state = CHANNEL_READING;
                 d_nbr_samples_since_last_peak = 0;
                 d_nbr_peak_detected= 1;
+                //printf("%s\n", "Signal ");
               }
             break;
 
@@ -78,6 +83,7 @@ namespace gr {
             case CHANNEL_READING:
               // SECURITY OUT OF FRAME
               d_nbr_samples_since_last_peak++;
+              //printf("%s\n", "Signal ");
               if(d_nbr_samples_since_last_peak > d_nbr_samples_guard_time){
                 d_state = DETECTION;
                 d_nbr_of_channels = d_nbr_peak_detected - 2;

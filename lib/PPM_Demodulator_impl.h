@@ -28,6 +28,9 @@ namespace gr {
 
       void set_demod_on(int new_state) {d_demod_on = new_state;}
 
+      float* get_channels() {return d_command_values;}
+      int get_nbr_channels() {return d_nbr_of_channels;}
+
       int general_work(int noutput_items,
            gr_vector_int &ninput_items,
            gr_vector_const_void_star &input_items,
