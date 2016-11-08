@@ -1,17 +1,17 @@
 /* -*- c++ -*- */
-/* 
+/*
  * Copyright 2016 <+YOU OR YOUR COMPANY+>.
- * 
+ *
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3, or (at your option)
  * any later version.
- * 
+ *
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this software; see the file COPYING.  If not, write to
  * the Free Software Foundation, Inc., 51 Franklin Street,
@@ -46,11 +46,12 @@ namespace gr {
        * class. PPM_Analog_RC::PPM_Demodulator::make is the public interface for
        * creating new instances.
        */
-      static sptr make(float samp_rate);
+      static sptr make(float samp_rate, int demod_on);
+
+      virtual void set_demod_on(int new_state) = 0;
     };
 
   } // namespace PPM_Analog_RC
 } // namespace gr
 
 #endif /* INCLUDED_PPM_ANALOG_RC_PPM_DEMODULATOR_H */
-

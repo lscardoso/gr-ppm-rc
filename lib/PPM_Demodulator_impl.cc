@@ -17,15 +17,16 @@
 namespace gr {
   namespace PPM_Analog_RC {
     PPM_Demodulator::sptr
-    PPM_Demodulator::make(float samp_rate)
+    PPM_Demodulator::make(float samp_rate, int demod_on)
     {
       return gnuradio::get_initial_sptr
-        (new PPM_Demodulator_impl(samp_rate));
+        (new PPM_Demodulator_impl(samp_rate, demod_on));
     }
-    PPM_Demodulator_impl::PPM_Demodulator_impl(float samp_rate)
+    PPM_Demodulator_impl::PPM_Demodulator_impl(float samp_rate, int demod_on)
       : gr::block("PPM_Demodulator",
               gr::io_signature::make(1, 1, sizeof(float)),
-              gr::io_signature::make(0, 0, sizeof(float)))
+              gr::io_signature::make(0, 0, sizeof(float))),
+        d_demod_on(demod_on)
     {
       //INIT
       d_nbr_of_channels = 0;
@@ -33,7 +34,7 @@ namespace gr {
       d_nbr_samples_since_displayed = 0;
       d_nbr_samples_since_last_peak = 0;
       d_nbr_samples_guard_time = samp_rate * GUARD_TIME;
-      d_nbr_samples_refreshing_display = samp_rate * 1.0 / 12.0 ; 
+      d_nbr_samples_refreshing_display = samp_rate * 1.0 / 12.0 ;
       d_nbr_samples_command_spread = COMMAND_SPREAD * samp_rate;
       d_nbr_samples_command_zero = COMMAND_ZERO * samp_rate;
 
@@ -57,50 +58,51 @@ namespace gr {
       const float *in = (const float *) input_items[0];
       float *out = (float *) output_items[0];
 
-      
-      for(int i = 0; i < noutput_items; i++){
-        switch(d_state){
+      if(d_demod_on==1){
+        for(int i = 0; i < noutput_items; i++){
+          switch(d_state){
 
 
 
-          case DETECTION:
-            // PEAK DETECTED
-            if(in[i] > 0){
-              d_state = CHANNEL_READING;
-              d_nbr_samples_since_last_peak = 0;
-              d_nbr_peak_detected= 1;
-            }
-          break;
+            case DETECTION:
+              // PEAK DETECTED
+              if(in[i] > 0){
+                d_state = CHANNEL_READING;
+                d_nbr_samples_since_last_peak = 0;
+                d_nbr_peak_detected= 1;
+              }
+            break;
 
 
 
-          case CHANNEL_READING:
-            // SECURITY OUT OF FRAME
-            d_nbr_samples_since_last_peak++;
-            if(d_nbr_samples_since_last_peak > d_nbr_samples_guard_time){
-              d_state = DETECTION;
-              d_nbr_of_channels = d_nbr_peak_detected - 2;
-            }
+            case CHANNEL_READING:
+              // SECURITY OUT OF FRAME
+              d_nbr_samples_since_last_peak++;
+              if(d_nbr_samples_since_last_peak > d_nbr_samples_guard_time){
+                d_state = DETECTION;
+                d_nbr_of_channels = d_nbr_peak_detected - 2;
+              }
 
-            // PEAK DETECTED
-            if(in[i] > 0){
-              d_command_values[d_nbr_peak_detected- 1] = 5 + (d_nbr_samples_since_last_peak - d_nbr_samples_command_zero) / d_nbr_samples_command_spread;
-              d_state = CHANNEL_READING;
-              d_nbr_peak_detected++;
-              d_nbr_samples_since_last_peak = 0;
-            }
-          break;
-        }
-        
+              // PEAK DETECTED
+              if(in[i] > 0){
+                d_command_values[d_nbr_peak_detected- 1] = 5 + (d_nbr_samples_since_last_peak - d_nbr_samples_command_zero) / d_nbr_samples_command_spread;
+                d_state = CHANNEL_READING;
+                d_nbr_peak_detected++;
+                d_nbr_samples_since_last_peak = 0;
+              }
+            break;
+          }
 
 
-        // DISPLAY COMMANDS
-        d_nbr_samples_since_displayed++;
-        if(d_nbr_samples_since_displayed > d_nbr_samples_refreshing_display){
-          d_nbr_samples_since_displayed = 0;
-          printf("\rRC>_ ");
-          for(int j = 0; j < d_nbr_of_channels; j++)
-            printf("%sCH%d = %1.2f \t %s", BLUE, (j+1), d_command_values[j], WHITE);
+
+          // DISPLAY COMMANDS
+          d_nbr_samples_since_displayed++;
+          if(d_nbr_samples_since_displayed > d_nbr_samples_refreshing_display){
+            d_nbr_samples_since_displayed = 0;
+            printf("\rRC>_ ");
+            for(int j = 0; j < d_nbr_of_channels; j++)
+              printf("%sCH%d = %1.2f \t %s", BLUE, (j+1), d_command_values[j], WHITE);
+          }
         }
       }
 
@@ -110,4 +112,3 @@ namespace gr {
     }
   } /* namespace PPM_Analog_RC */
 } /* namespace gr */
-

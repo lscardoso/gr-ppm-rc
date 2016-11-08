@@ -1,14 +1,21 @@
 <block>
-  <name>PPM Demodulator</name>
+  <name>Ppm demodulator</name>
   <key>PPM_Analog_RC_PPM_Demodulator</key>
-  <category>PPM_ANALOG_RC</category>
+  <category>[PPM_ANALOG_RC]</category>
   <import>import PPM_Analog_RC</import>
-  <make>PPM_Analog_RC.PPM_Demodulator($samp_rate, $frame_guard_time)</make>
+  <make>PPM_Analog_RC.PPM_Demodulator($samp_rate, $demod_on)</make>
+  <callback>set_demod_on($demod_on)</callback>
   <param>
     <name>Sample Rate</name>
     <key>samp_rate</key>
     <value>samp_rate</value>
     <type>float</type>
+  </param>
+  <param>
+    <name>Is demodulation on</name>
+    <key>demod_on</key>
+    <value>is_demod_on</value>
+    <type>int</type>
   </param>
   <sink>
     <name>in</name>

@@ -195,7 +195,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(32, 464)</value>
+      <value>(8, 288)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -203,7 +203,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>decode</value>
+      <value>controller_callback</value>
     </param>
     <param>
       <key>value</key>
@@ -239,6 +239,33 @@
     <param>
       <key>value</key>
       <value>72.010e6</value>
+    </param>
+  </block>
+  <block>
+    <key>variable</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(8, 484)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>is_demod_on</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>0</value>
     </param>
   </block>
   <block>
@@ -328,7 +355,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(48, 336)</value>
+      <value>(8, 688)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -371,7 +398,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>400000</value>
+      <value>1000000</value>
     </param>
   </block>
   <block>
@@ -394,7 +421,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1400, 165)</value>
+      <value>(1408, 164)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -403,6 +430,10 @@
     <param>
       <key>id</key>
       <value>PPM_Analog_RC_PPM_Demodulator_0</value>
+    </param>
+    <param>
+      <key>demod_on</key>
+      <value>is_demod_on</value>
     </param>
     <param>
       <key>samp_rate</key>
@@ -511,7 +542,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>0</value>
+      <value>1</value>
     </param>
     <param>
       <key>energy_threshold</key>
@@ -519,7 +550,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1192, 270)</value>
+      <value>(1192, 264)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1115,7 +1146,11 @@
     </param>
     <param>
       <key>_io_cache</key>
-      <value>('Embedded Python Block', 'controller', [('example_param', '1.0')], [], [], 'Embedded Python Block example - a simple multiply const', ['example_param'])</value>
+      <value>('PPM Demodulation controller', 'controller', [('low_freq_boundary', '72010000'), ('high_freq_boundary', '72990000'), ('channel_width', '20000')], [], [], 'Embedded Python Block example - a simple multiply const', ['channel_width', 'high_freq_boundary', 'low_freq_boundary'])</value>
+    </param>
+    <param>
+      <key>channel_width</key>
+      <value>20000</value>
     </param>
     <param>
       <key>_source_code</key>
@@ -1134,46 +1169,43 @@ from gnuradio import gr
 class controller(gr.basic_block):  # other base classes are basic_block, decim_block, interp_block
     """Embedded Python Block example - a simple multiply const"""
 
-	
 
-    def __init__(self, example_param=1.0):  # only default arguments here
+
+    def __init__(self, low_freq_boundary=72010000, high_freq_boundary=72990000, channel_width=20000):  # only default arguments here
         """arguments to this function show up as parameters in GRC"""
         gr.basic_block.__init__(
             self,
-            name='Embedded Python Block',   # will show up in GRC
+            name='PPM Demodulation controller',   # will show up in GRC
             in_sig=[],
             out_sig=[]
         )
         # if an attribute with the same name as a parameter is found,
         # a callback is registered (properties work, too).
-        self.example_param = example_param
-	self.should_start = False
+        self.low_freq_boundary = low_freq_boundary
+        self.high_freq_boundary = high_freq_boundary
+        self.channel_width = channel_width
+        self.should_start = False
 
     def check_signal(self, obj):
-	if self.should_start == False :
-		self.should_start = True
-		return 0
+    	if self.should_start == False :
+    		self.should_start = True
+    		return 0
 
-	if(obj.probing_block.level() &gt;=1):
-		decode = 1
-		print 'yay'
-		return 1
-	else:
-		newfreq = obj.frequency_carrier + 20000
-		if newfreq &gt; 72990000:				#Loop on available channels
-			newfreq = 72010000
-		obj.set_frequency_carrier(newfreq)		
-		print 'truc'
-		return 0
-
+    	if(obj.probing_block.level() &gt;=1):
+    		decode = 1
+    		print 'Signal detected'
+    		return 1
+    	else :
+            newfreq = obj.frequency_carrier + self.channel_width   #Loop on available channels
+            if (newfreq &gt; self.high_freq_boundary):
+                newfreq = self.low_freq_boundary
+            obj.set_frequency_carrier(newfreq)
+            return 0
 
 
-
-
-
-def work(self, input_items, output_items):
+    def work(self, input_items, output_items):
         """example: multiply with constant"""
-        output_items[0][:] = input_items[0] * self.example_param
+        #output_items[0][:] = input_items[0] * self.example_param
         return len(output_items[0])
 </value>
     </param>
@@ -1186,20 +1218,24 @@ def work(self, input_items, output_items):
       <value>True</value>
     </param>
     <param>
-      <key>example_param</key>
-      <value>1.0</value>
-    </param>
-    <param>
       <key>_coordinate</key>
-      <value>(32, 572)</value>
+      <value>(8, 396)</value>
     </param>
     <param>
       <key>_rotation</key>
       <value>0</value>
     </param>
     <param>
+      <key>high_freq_boundary</key>
+      <value>72990000</value>
+    </param>
+    <param>
       <key>id</key>
       <value>controller</value>
+    </param>
+    <param>
+      <key>low_freq_boundary</key>
+      <value>72010000</value>
     </param>
   </block>
   <block>
@@ -1241,7 +1277,7 @@ def check_signal(obj):
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(72, 420)</value>
+      <value>(8, 772)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1296,7 +1332,7 @@ def check_signal(obj):
     </param>
     <param>
       <key>gain</key>
-      <value>1</value>
+      <value>3</value>
     </param>
     <param>
       <key>id</key>
@@ -1548,7 +1584,7 @@ def check_signal(obj):
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1400, 270)</value>
+      <value>(1408, 260)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -2274,7 +2310,7 @@ def check_signal(obj):
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1000, 340)</value>
+      <value>(1192, 340)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -3067,7 +3103,7 @@ def check_signal(obj):
     </param>
     <param>
       <key>gain_mode0</key>
-      <value>False</value>
+      <value>True</value>
     </param>
     <param>
       <key>if_gain0</key>
@@ -3079,7 +3115,7 @@ def check_signal(obj):
     </param>
     <param>
       <key>gain0</key>
-      <value>10</value>
+      <value>20.7</value>
     </param>
     <param>
       <key>ant10</key>
@@ -4339,7 +4375,7 @@ def check_signal(obj):
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(248, 124)</value>
+      <value>(248, 116)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -6618,6 +6654,12 @@ def check_signal(obj):
   </connection>
   <connection>
     <source_block_id>PPM_Analog_RC_PPM_Signal_Detector_0</source_block_id>
+    <sink_block_id>probing_block</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>PPM_Analog_RC_PPM_Signal_Detector_0</source_block_id>
     <sink_block_id>qtgui_time_sink_x_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
@@ -6684,9 +6726,9 @@ def check_signal(obj):
   </connection>
   <connection>
     <source_block_id>blocks_threshold_ff_0</source_block_id>
-    <sink_block_id>probing_block</sink_block_id>
+    <sink_block_id>PPM_Analog_RC_PPM_Signal_Detector_0</sink_block_id>
     <source_key>0</source_key>
-    <sink_key>0</sink_key>
+    <sink_key>1</sink_key>
   </connection>
   <connection>
     <source_block_id>blocks_threshold_ff_0</source_block_id>
@@ -6717,12 +6759,6 @@ def check_signal(obj):
     <sink_block_id>blocks_multiply_const_vxx_0_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>low_pass_filter_1</source_block_id>
-    <sink_block_id>PPM_Analog_RC_PPM_Signal_Detector_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>1</sink_key>
   </connection>
   <connection>
     <source_block_id>low_pass_filter_1</source_block_id>
