@@ -3,7 +3,7 @@
   <key>PPM_Analog_RC_PPM_Demodulator</key>
   <category>PPM_ANALOG_RC</category>
   <import>import PPM_Analog_RC</import>
-  <make>PPM_Analog_RC.PPM_Demodulator($samp_rate, $frame_guard_time)</make>
+  <make>PPM_Analog_RC.PPM_Demodulator($samp_rate)</make>
   <param>
     <name>Sample Rate</name>
     <key>samp_rate</key>
