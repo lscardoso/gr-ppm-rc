@@ -83,18 +83,25 @@ namespace gr {
             case CHANNEL_READING:
               // SECURITY OUT OF FRAME
               d_nbr_samples_since_last_peak++;
-              //printf("%s\n", "Signal ");
+
               if(d_nbr_samples_since_last_peak > d_nbr_samples_guard_time){
                 d_state = DETECTION;
-                d_nbr_of_channels = d_nbr_peak_detected - 2;
+                d_nbr_of_channels = d_nbr_peak_detected - 1;
+                break;
+              }
+              if(d_nbr_peak_detected>18){
+                d_state = DETECTION;
+                d_nbr_of_channels = 0;
+                break;
               }
 
               // PEAK DETECTED
               if(in[i] > 0){
-                d_command_values[d_nbr_peak_detected- 1] = 5 + (d_nbr_samples_since_last_peak - d_nbr_samples_command_zero) / d_nbr_samples_command_spread;
+                d_command_values[d_nbr_peak_detected- 1] =/* 5 + */(d_nbr_samples_since_last_peak - d_nbr_samples_command_zero) / d_nbr_samples_command_spread;
                 d_state = CHANNEL_READING;
                 d_nbr_peak_detected++;
                 d_nbr_samples_since_last_peak = 0;
+                //printf("%s\n", "Peak!! ");
               }
             break;
           }

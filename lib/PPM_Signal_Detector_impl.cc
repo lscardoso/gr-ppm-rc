@@ -66,11 +66,9 @@ namespace gr {
 				}
 
 
-				// TEST GUARD TIME 
-				(in[i] > 0) ? d_time_constant = 0 : d_time_constant++;
+				(in[i] > 0.03) ? d_time_constant = 0 : d_time_constant++;
 				(d_time_constant > d_max_time_constant) ? d_max_time_constant = d_time_constant : 1;
 				(d_max_time_constant / d_samp_rate > GUARD_TIME_MIN && d_max_time_constant / d_samp_rate < GUARD_TIME_MAX) ? d_bool_guard_time = 1 : d_bool_guard_time = 0;
-				
 
 				// OUTPUT
 				if(d_bool_signal_energy && d_bool_guard_time){
