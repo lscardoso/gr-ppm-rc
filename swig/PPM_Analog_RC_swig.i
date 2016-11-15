@@ -25,3 +25,6 @@ GR_SWIG_BLOCK_MAGIC2(PPM_Analog_RC, PPM_Signal_Detector);
 
 %include "PPM_Analog_RC/PPM_Modulator.h"
 GR_SWIG_BLOCK_MAGIC2(PPM_Analog_RC, PPM_Modulator);
+
+%include "carrays.i"
+%array_functions(float, floatArray);

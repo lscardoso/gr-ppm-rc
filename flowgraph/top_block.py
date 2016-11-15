@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Top Block
-# Generated: Tue Nov  8 18:15:49 2016
+# Generated: Tue Nov 15 17:48:29 2016
 ##################################################
 
 if __name__ == '__main__':
@@ -68,12 +68,12 @@ class top_block(gr.top_block, Qt.QWidget):
         self.frequency_carrier = frequency_carrier = 72.010e6
         self.controller_callback_0 = controller_callback_0 = 1
         self.controller_callback = controller_callback = 1
-        self.bandwith = bandwith = 50e3
+        self.bandwith = bandwith = 10e3
 
         ##################################################
         # Blocks
         ##################################################
-        self.controller = controller.controller(low_freq_boundary=72010000, high_freq_boundary=72990000, channel_width=20000)
+        self.controller = controller.controller(low_freq_boundary=72.010e6, high_freq_boundary=72.900e6, channel_width=20e3)
         self.rtlsdr_source_0 = osmosdr.source( args="numchan=" + str(1) + " " + '' )
         self.rtlsdr_source_0.set_sample_rate(samp_rate)
         self.rtlsdr_source_0.set_center_freq(frequency_carrier, 0)
@@ -140,7 +140,7 @@ class top_block(gr.top_block, Qt.QWidget):
         self.qtgui_time_sink_x_1 = qtgui.time_sink_f(
         	1024, #size
         	samp_rate, #samp_rate
-        	"", #name
+        	"Filtered", #name
         	1 #number of inputs
         )
         self.qtgui_time_sink_x_1.set_update_time(0.10)
@@ -232,10 +232,10 @@ class top_block(gr.top_block, Qt.QWidget):
         self._qtgui_time_sink_x_0_0_win = sip.wrapinstance(self.qtgui_time_sink_x_0_0.pyqwidget(), Qt.QWidget)
         self.top_layout.addWidget(self._qtgui_time_sink_x_0_0_win)
         self.qtgui_time_sink_x_0 = qtgui.time_sink_f(
-        	10240, #size
+        	40240, #size
         	samp_rate, #samp_rate
-        	"", #name
-        	1 #number of inputs
+        	"Peaks", #name
+        	2 #number of inputs
         )
         self.qtgui_time_sink_x_0.set_update_time(0.10)
         self.qtgui_time_sink_x_0.set_y_axis(-1, 1)
@@ -243,7 +243,7 @@ class top_block(gr.top_block, Qt.QWidget):
         self.qtgui_time_sink_x_0.set_y_label('Amplitude', "")
         
         self.qtgui_time_sink_x_0.enable_tags(-1, True)
-        self.qtgui_time_sink_x_0.set_trigger_mode(qtgui.TRIG_MODE_FREE, qtgui.TRIG_SLOPE_POS, 100, 0.01, 0, "")
+        self.qtgui_time_sink_x_0.set_trigger_mode(qtgui.TRIG_MODE_NORM, qtgui.TRIG_SLOPE_POS, 0.5, 0.01, 0, "")
         self.qtgui_time_sink_x_0.enable_autoscale(False)
         self.qtgui_time_sink_x_0.enable_grid(False)
         self.qtgui_time_sink_x_0.enable_axis_labels(True)
@@ -265,7 +265,7 @@ class top_block(gr.top_block, Qt.QWidget):
         alphas = [1.0, 1.0, 1.0, 1.0, 1.0,
                   1.0, 1.0, 1.0, 1.0, 1.0]
         
-        for i in xrange(1):
+        for i in xrange(2):
             if len(labels[i]) == 0:
                 self.qtgui_time_sink_x_0.set_line_label(i, "Data {0}".format(i))
             else:
@@ -291,7 +291,7 @@ class top_block(gr.top_block, Qt.QWidget):
                     self.set_controller_callback_0(val)
                 except AttributeError:
                     pass
-                time.sleep(1.0 / (50))
+                time.sleep(1.0 / (10))
         _controller_callback_0_thread = threading.Thread(target=_controller_callback_0_probe)
         _controller_callback_0_thread.daemon = True
         _controller_callback_0_thread.start()
@@ -304,7 +304,7 @@ class top_block(gr.top_block, Qt.QWidget):
                     self.set_controller_callback(val)
                 except AttributeError:
                     pass
-                time.sleep(1.0 / (20))
+                time.sleep(1.0 / (5))
         _controller_callback_thread = threading.Thread(target=_controller_callback_probe)
         _controller_callback_thread.daemon = True
         _controller_callback_thread.start()
@@ -320,18 +320,20 @@ class top_block(gr.top_block, Qt.QWidget):
         self.analog_const_source_x_0_0 = analog.sig_source_f(0, analog.GR_CONST_WAVE, 0, 0, 1)
         self.PPM_Demodulator = PPM_Analog_RC.PPM_Demodulator(samp_rate, is_demod_on)
         self.PPM_Analog_RC_PPM_Signal_Detector_0 = PPM_Analog_RC.PPM_Signal_Detector(samp_rate, 10)
-        self.PPM_Analog_RC_PPM_Peak_Detector_0 = PPM_Analog_RC.PPM_Peak_Detector(0.5)
+        self.PPM_Analog_RC_PPM_Peak_Detector_0 = PPM_Analog_RC.PPM_Peak_Detector(0.03)
 
         ##################################################
         # Connections
         ##################################################
+        self.connect((self.PPM_Analog_RC_PPM_Peak_Detector_0, 0), (self.PPM_Analog_RC_PPM_Signal_Detector_0, 0))    
         self.connect((self.PPM_Analog_RC_PPM_Peak_Detector_0, 0), (self.PPM_Demodulator, 0))    
         self.connect((self.PPM_Analog_RC_PPM_Peak_Detector_0, 0), (self.qtgui_time_sink_x_0, 0))    
         self.connect((self.PPM_Analog_RC_PPM_Signal_Detector_0, 0), (self.probing_block, 0))    
+        self.connect((self.PPM_Analog_RC_PPM_Signal_Detector_0, 0), (self.qtgui_time_sink_x_0, 1))    
         self.connect((self.analog_const_source_x_0_0, 0), (self.blocks_multiply_const_vxx_1, 0))    
         self.connect((self.analog_wfm_rcv_0, 0), (self.low_pass_filter_1, 0))    
         self.connect((self.blocks_multiply_const_vxx_0, 0), (self.PPM_Analog_RC_PPM_Peak_Detector_0, 0))    
-        self.connect((self.blocks_multiply_const_vxx_0, 0), (self.PPM_Analog_RC_PPM_Signal_Detector_0, 0))    
+        self.connect((self.blocks_multiply_const_vxx_0, 0), (self.qtgui_time_sink_x_1, 0))    
         self.connect((self.blocks_multiply_const_vxx_1, 0), (self.qtgui_time_sink_x_0_0, 0))    
         self.connect((self.blocks_rms_xx_0, 0), (self.blocks_threshold_ff_0, 0))    
         self.connect((self.blocks_threshold_ff_0, 0), (self.PPM_Analog_RC_PPM_Signal_Detector_0, 1))    
@@ -339,7 +341,6 @@ class top_block(gr.top_block, Qt.QWidget):
         self.connect((self.low_pass_filter_0, 0), (self.blocks_rms_xx_0, 0))    
         self.connect((self.low_pass_filter_0, 0), (self.qtgui_time_sink_x_3, 0))    
         self.connect((self.low_pass_filter_1, 0), (self.blocks_multiply_const_vxx_0, 0))    
-        self.connect((self.low_pass_filter_1, 0), (self.qtgui_time_sink_x_1, 0))    
         self.connect((self.rtlsdr_source_0, 0), (self.low_pass_filter_0, 0))    
 
     def closeEvent(self, event):

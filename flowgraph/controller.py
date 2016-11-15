@@ -12,6 +12,8 @@ import numpy as np
 import Tkinter as tk
 from gnuradio import gr
 import time
+import PPM_Analog_RC
+
 
 class controller(gr.basic_block):  # other base classes are basic_block, decim_block, interp_block
     """Embedded Python Block example - a simple multiply const"""
@@ -42,12 +44,12 @@ class controller(gr.basic_block):  # other base classes are basic_block, decim_b
             self.should_start = True
             def launchWindow():
                 self.window = ui(self)
-                self.window.master.title('Sample application')
+                self.window.master.title('PPM RC Hack')
                 self.window.mainloop()
             self._window_thread = threading.Thread(target=launchWindow)
             self._window_thread.daemon = True
             self._window_thread.start()
-            time.sleep(0.05)
+            time.sleep(0.1)
             self.window.freqLabel.config(text= "Frequency: " + str(self.low_freq_boundary/1000000.0) + "MHz")
             return 0
 
@@ -60,6 +62,7 @@ class controller(gr.basic_block):  # other base classes are basic_block, decim_b
             obj.set_is_demod_on(0)
             print 'Changing channel'
             self.window.freqLabel.config(text= "Frequency: " + str(newfreq/1000000.0) + "MHz")
+            self.window.channelInfoLabel.config(text = '')
             self.found_last[0] = 0
             self.found_last[1] = False
             self.decode = False
@@ -68,19 +71,16 @@ class controller(gr.basic_block):  # other base classes are basic_block, decim_b
         if self.input_key == 'enter':       #Placeholder to switch to transmission
             self.input_key = ''
 
-        if(obj.probing_block.level() >=0):      #Actual check if signal is detected by the signal detector block
+        if(obj.probing_block.level() >=1):      #Actual check if signal is detected by the signal detector block
             if self.found_last[0] is True:      #To smooth burst of false results
-                if self.found_last[1] == False: #To act only if we just arrived on this channel
-                    self.window.detectedLabel.config(text="Signal detected: press esc to continue sweep/n  press entre to switch to transmittion mode (not implemented yet)")
+                if self.found_last[1] is False: #To act only if we just arrived on this channel
+                    self.window.detectedLabel.config(text='''Signal detected: press esc to continue sweep
+press enter to switch to transmittion mode (not implemented yet)''')
                     obj.set_is_demod_on(1)
-                    print obj.get_is_demod_on()
                     self.found_last[1] = True
                     self.decode = True
-                else:
-                    pass
                 return 1
             else:
-
                 self.found_last[0] = True
                 return 0
         else :
@@ -90,11 +90,14 @@ class controller(gr.basic_block):  # other base classes are basic_block, decim_b
                     newfreq = self.low_freq_boundary
                 obj.set_frequency_carrier(newfreq)
                 obj.set_is_demod_on(0)
+
                 self.window.detectedLabel.config(text=" Sweeping... ")
                 self.window.freqLabel.config(text= "Frequency: " + str(newfreq/1000000.0) + "MHz")
+                self.window.channelInfoLabel.config(text = '')
                 self.found_last[0] = 0
                 self.found_last[1] = False
                 self.decode = False
+                print 'Changing channel nothing found' + "  Frequency: " +str(newfreq/1000000.0) + "MHz"
                 return 0
             else:
                 self.found_last[0] = False
@@ -105,9 +108,9 @@ class controller(gr.basic_block):  # other base classes are basic_block, decim_b
             channelValues = obj.PPM_Demodulator.get_channels()
             nbChannels = obj.PPM_Demodulator.get_nbr_channels()
             string = str(nbChannels) + " channels detected: "
-            print channelValues
-            for i in xrange(1,nbChannels):
-                string = string + "CH" + str(i) + ": " + str(channelValues[i-1]) + " | "
+            if nbChannels > 0:
+                for i in xrange(1,nbChannels+1):
+                    string = string + "CH" + str(i) + ": " + '{:03.2f}'.format(PPM_Analog_RC.floatArray_getitem(channelValues, index=(i-1))) + " | "
             self.window.channelInfoLabel.config(text = string)
 
 
