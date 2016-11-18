@@ -26,7 +26,6 @@ namespace gr {
       ~PPM_Demodulator_impl();
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);
 
-      void set_demod_on(int new_state) {d_demod_on = new_state;}
       void set_demod_on(int new_state) {
             d_demod_on = new_state;
             d_state = 0;

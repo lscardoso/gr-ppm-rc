@@ -39,6 +39,38 @@ class controller(gr.basic_block):  # other base classes are basic_block, decim_b
         self.decode = False
 
 
+
+
+    def connectTransmitter(self, obj):
+        obj.lock()
+        obj.connect((obj.PPM_Modulator, 0), (obj.blocks_multiply_const_vxx_1_0, 0))
+        obj.connect((obj.root_raised_cosine_transmitter, 0), (obj.qtgui_time_sink_x_2, 0))
+        obj.connect((obj.blocks_multiply_const_vxx_1_0, 0), (obj.root_raised_cosine_transmitter, 0))
+        #obj.connect((obj.PPM_Modulator, 0), (obj.root_raised_cosine_transmitter, 0))
+        obj.connect((obj.add_const_transmitter, 0), (obj.analog_wfm_tx, 0))
+        obj.connect((obj.analog_wfm_tx, 0), (obj.uhd_usrp_sink, 0))
+        obj.connect((obj.low_pass_filter_transmitter, 0), (obj.multiply_const_transmitter, 0))
+        obj.connect((obj.multiply_const_transmitter, 0), (obj.add_const_transmitter, 0))
+        obj.connect((obj.root_raised_cosine_transmitter, 0), (obj.low_pass_filter_transmitter, 0))
+        obj.unlock()
+
+    def disconnectTransmitter(self, obj):
+        if obj == "self":
+            return
+        obj.lock()
+        obj.disconnect((obj.PPM_Modulator, 0), (obj.blocks_multiply_const_vxx_1_0, 0))
+        obj.disconnect((obj.root_raised_cosine_transmitter, 0), (obj.qtgui_time_sink_x_2, 0))
+        obj.disconnect((obj.blocks_multiply_const_vxx_1_0, 0), (obj.root_raised_cosine_transmitter, 0))
+        #obj.disconnect((obj.PPM_Modulator, 0), (obj.root_raised_cosine_transmitter, 0))
+        obj.disconnect((obj.add_const_transmitter, 0), (obj.analog_wfm_tx, 0))
+        obj.disconnect((obj.analog_wfm_tx, 0), (obj.uhd_usrp_sink, 0))
+        obj.disconnect((obj.low_pass_filter_transmitter, 0), (obj.multiply_const_transmitter, 0))
+        obj.disconnect((obj.multiply_const_transmitter, 0), (obj.add_const_transmitter, 0))
+        obj.disconnect((obj.root_raised_cosine_transmitter, 0), (obj.low_pass_filter_transmitter, 0))
+        obj.unlock()
+
+
+
     def check_signal(self, obj):
         if self.should_start == False :
             self.should_start = True
@@ -50,6 +82,8 @@ class controller(gr.basic_block):  # other base classes are basic_block, decim_b
             self._window_thread.daemon = True
             self._window_thread.start()
             time.sleep(0.1)
+            self.disconnectTransmitter(obj)
+            self.transmitting = False
             self.window.freqLabel.config(text= "Frequency: " + str(self.low_freq_boundary/1000000.0) + "MHz")
             return 0
 
@@ -70,6 +104,13 @@ class controller(gr.basic_block):  # other base classes are basic_block, decim_b
 
         if self.input_key == 'enter':       #Placeholder to switch to transmission
             self.input_key = ''
+            print 'switching transmitter'
+            if self.transmitting:
+                self.disconnectTransmitter(obj)
+                self.transmitting = False
+            else:
+                self.connectTransmitter(obj)
+                self.transmitting = True
 
         if(obj.probing_block.level() >=1):      #Actual check if signal is detected by the signal detector block
             if self.found_last[0] is True:      #To smooth burst of false results
@@ -112,6 +153,9 @@ press enter to switch to transmittion mode (not implemented yet)''')
                 for i in xrange(1,nbChannels+1):
                     string = string + "CH" + str(i) + ": " + '{:03.2f}'.format(PPM_Analog_RC.floatArray_getitem(channelValues, index=(i-1))) + " | "
             self.window.channelInfoLabel.config(text = string)
+
+
+
 
 
 
