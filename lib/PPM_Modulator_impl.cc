@@ -68,6 +68,8 @@ namespace gr {
 				d_nbr_samples_channel[i] = COMMAND_ZERO * samp_rate;
 			d_nbr_samples_channel[NBR_CHANNEL + 1] = GUARD_TIME * samp_rate;
 			d_command_step = COMMAND_STEP * samp_rate;
+      d_nbr_samples_command_spread = COMMAND_SPREAD * samp_rate;
+      d_nbr_samples_command_zero = COMMAND_ZERO * samp_rate;
 
 			// WELCOME
 			printf("\n\n%sWelcome to Drone PPM Analog RC Transmitter!\n", RED);
@@ -86,7 +88,7 @@ namespace gr {
 		void
 		PPM_Modulator_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
 		{
-			ninput_items_required[0] = noutput_items;
+			ninput_items_required[0] = /*noutput_items*/ 0;
 		}
 		int
 		PPM_Modulator_impl::general_work (int noutput_items,
@@ -106,7 +108,7 @@ namespace gr {
 					d_nbr_samples = 0;
 					d_nbr_channel = (d_nbr_channel + 1) % (NBR_CHANNEL + 2);
 				}
-
+/*
 	  			// CHECK COMMANDS
 				if(kbhit()){
 					switch(getch()){
@@ -135,11 +137,10 @@ namespace gr {
 							d_nbr_samples_channel[3] += d_command_step;
 						break;
 					}
-				}			
-			}      
+				}*/
+			}
 			consume_each (noutput_items);
 			return noutput_items;
 	}
   } /* namespace PPM_Analog_RC */
 } /* namespace gr */
-

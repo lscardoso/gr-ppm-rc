@@ -107,7 +107,7 @@ namespace gr {
           }
 
 
-
+/*
           // DISPLAY COMMANDS
           d_nbr_samples_since_displayed++;
           if(d_nbr_samples_since_displayed > d_nbr_samples_refreshing_display){
@@ -115,7 +115,7 @@ namespace gr {
             printf("\rRC>_ ");
             for(int j = 0; j < d_nbr_of_channels; j++)
               printf("%sCH%d = %1.2f \t %s", BLUE, (j+1), d_command_values[j], WHITE);
-          }
+          }*/
         }
       }
 
