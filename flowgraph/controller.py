@@ -45,31 +45,31 @@ class controller(gr.basic_block):  # other base classes are basic_block, decim_b
     def connectTransmitter(self, obj):
         obj.lock()
         obj.connect((obj.PPM_Modulator, 0), (obj.variable_qtgui_range_00, 0))
-        obj.connect((obj.add_const_transmitter, 0), (obj.analog_wfm_tx, 0))
-        obj.connect((obj.analog_wfm_tx, 0), (obj.uhd_usrp_sink, 0))
         obj.connect((obj.low_pass_filter_transmitter, 0), (obj.multiply_const_transmitter, 0))
         obj.connect((obj.multiply_const_transmitter, 0), (obj.add_const_transmitter, 0))
         obj.connect((obj.root_raised_cosine_transmitter, 0), (obj.low_pass_filter_transmitter, 0))
         obj.connect((obj.variable_qtgui_range_00, 0), (obj.root_raised_cosine_transmitter, 0))
-
-
+        obj.connect((obj.blocks_vco_c_0, 0), (obj.uhd_usrp_sink, 0))
+        obj.connect((obj.add_const_transmitter, 0), (obj.blocks_vco_c_0, 0))
         obj.unlock()
 
     def disconnectTransmitter(self, obj):
 
         obj.lock()
         obj.disconnect((obj.PPM_Modulator, 0), (obj.variable_qtgui_range_00, 0))
-        obj.disconnect((obj.add_const_transmitter, 0), (obj.analog_wfm_tx, 0))
-        obj.disconnect((obj.analog_wfm_tx, 0), (obj.uhd_usrp_sink, 0))
         obj.disconnect((obj.low_pass_filter_transmitter, 0), (obj.multiply_const_transmitter, 0))
         obj.disconnect((obj.multiply_const_transmitter, 0), (obj.add_const_transmitter, 0))
         obj.disconnect((obj.root_raised_cosine_transmitter, 0), (obj.low_pass_filter_transmitter, 0))
         obj.disconnect((obj.variable_qtgui_range_00, 0), (obj.root_raised_cosine_transmitter, 0))
+        obj.disconnect((obj.blocks_vco_c_0, 0), (obj.uhd_usrp_sink, 0))
+        obj.disconnect((obj.add_const_transmitter, 0), (obj.blocks_vco_c_0, 0))
         obj.unlock()
 
 
 
     def check_signal(self, obj):
+
+        #Inititalize the ui and disconnect transmitter on first call
         if self.should_start == False :
             self.should_start = True
             def launchWindow():
@@ -89,6 +89,7 @@ class controller(gr.basic_block):  # other base classes are basic_block, decim_b
             self.window.freqLabel.config(text= "Frequency: " + str(self.low_freq_boundary/1000000.0) + "MHz")
             return 0
 
+        #Switch to next channel
         if self.input_key == 'escape':
             self.input_key = ''
             newfreq = obj.frequency_carrier + self.channel_width   #Loop on available channels
@@ -104,7 +105,9 @@ class controller(gr.basic_block):  # other base classes are basic_block, decim_b
             self.decode = False
             return 0
 
-        if self.input_key == 'enter':       #Placeholder to switch to transmission
+
+        #Switch transmission on/off
+        if self.input_key == 'enter':
             self.input_key = ''
             print 'switching transmitter'
             if self.transmitting:
@@ -114,7 +117,9 @@ class controller(gr.basic_block):  # other base classes are basic_block, decim_b
                 self.connectTransmitter(obj)
                 self.transmitting = True
 
-        if(obj.probing_block.level() >=1):      #Actual check if signal is detected by the signal detector block
+
+        #Actual check if signal is detected by the signal detector block
+        if(obj.probing_block.level() >=1):
             if self.found_last[0] is True:      #To smooth burst of false results
                 if self.found_last[1] is False: #To act only if we just arrived on this channel
                     self.window.detectedLabel.config(text='''Signal detected: press esc to continue sweep
@@ -130,7 +135,7 @@ press enter to switch to transmittion mode (not implemented yet)''')
             if self.found_last[0] is False:
                 newfreq = obj.frequency_carrier + self.channel_width   #Loop on available channels
                 if (newfreq > self.high_freq_boundary):
-                    newfreq = self.low_freq_boundary + obj.freq
+                    newfreq = self.low_freq_boundary
                 obj.set_frequency_carrier(newfreq)
                 obj.set_is_demod_on(0)
 
@@ -146,6 +151,8 @@ press enter to switch to transmittion mode (not implemented yet)''')
                 self.found_last[0] = False
                 return 1
 
+
+    #Refresh the ui with channel values information
     def refreshUi(self, obj):
         if self.decode == True:
             channelValues = obj.PPM_Demodulator.get_channels()
@@ -157,10 +164,7 @@ press enter to switch to transmittion mode (not implemented yet)''')
             self.window.channelInfoLabel.config(text = string)
 
 
-
-
-
-
+    #Not in use
     def work(self, input_items, output_items):
         """example: multiply with constant"""
         #output_items[0][:] = input_items[0] * self.example_param
@@ -176,16 +180,20 @@ press enter to switch to transmittion mode (not implemented yet)''')
 class ui(tk.Frame):
     def __init__(self, calling, master=None):
         tk.Frame.__init__(self, master)
+        self.config(height = 100, width = 500)
         self.grid()
         self.createWidgets()
         self.calling = calling
 
     def createWidgets(self):
-        self.freqLabel = tk.Label()
+        self.frameOptions = tk.Frame()
+        self.frameSate = tk.Frame()
+
+        self.freqLabel = tk.Label(self.frameSate)
         self.freqLabel.grid()
-        self.detectedLabel = tk.Label(text=" Sweeping... ")
+        self.detectedLabel = tk.Label(self.frameSate, text=" Sweeping... ")
         self.detectedLabel.grid()
-        self.channelInfoLabel = tk.Label(text="  No channels  ")
+        self.channelInfoLabel = tk.Label(self.frameSate, text="  No channels  ")
         self.channelInfoLabel.grid()
         self.freqLabel.bind_all('<KeyPress-Return>', self._enterHandler)
         self.freqLabel.bind_all('<KeyPress-Escape>', self._escapeHandler)
@@ -197,7 +205,7 @@ class ui(tk.Frame):
         self.calling.input_key = 'escape'
 
 
-
+#Handle joystick inputs
 class stick():
     def __init__(self, calling, top_block):
         self.calling = calling
@@ -355,16 +363,21 @@ class stick():
                     if button:
                         self.button_states[button] = value
                         if value:
-                            print "%s pressed" % (button)
+                            #print "%s pressed" % (button)
+                            if button == 'trigger':
+                                self.calling.input_key = 'enter'
+                            elif button == 'thumb':
+                                self.calling.input_key = 'escape'
                         else:
-                            print "%s released" % (button)
+                            pass
+                            #print "%s released" % (button)
+
 
                 if type & 0x02:
                     axis = self.axis_map[number]
                     if axis:
                         fvalue = value / 32767.0
                         self.axis_states[axis] = fvalue
-                        #print "%s: %.3f" % (axis, fvalue)
                         if axis == 'trottle':
                             self.top_block.PPM_Modulator.set_axis(2, fvalue)
                         elif axis == 'y':

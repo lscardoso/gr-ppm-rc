@@ -20,7 +20,8 @@ namespace gr {
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);
 
       void set_axis(int axis_nbr, float value){
-        d_nbr_samples_channel[axis_nbr] = (value * d_nbr_samples_command_spread) + d_nbr_samples_command_zero;
+        if(axis_nbr>=0 && axis_nbr<5)
+          d_nbr_samples_channel[axis_nbr] = (value * d_nbr_samples_command_spread) + d_nbr_samples_command_zero;
       }
 
 

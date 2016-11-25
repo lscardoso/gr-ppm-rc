@@ -29,7 +29,7 @@ namespace gr {
   namespace PPM_Analog_RC {
 
     /*!
-     * \brief <+description of block+>
+     * \brief Generate peaks of ones coding the value of 5 channels with PPM modulation
      * \ingroup PPM_Analog_RC
      *
      */
@@ -48,6 +48,14 @@ namespace gr {
        */
       static sptr make(float samp_rate);
 
+      /*!
+       * \brief Set the given axis to the given value
+       *
+       * The axis number is an array index so first value is one
+       * The value should be between -1.0 and 1.0
+       *
+       *
+       */
       virtual void set_axis(int axis_nbr, float value) = 0;
     };
 
