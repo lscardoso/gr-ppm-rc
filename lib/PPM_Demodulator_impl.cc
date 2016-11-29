@@ -37,6 +37,7 @@ namespace gr {
       d_nbr_samples_refreshing_display = samp_rate * 1.0 / 12.0 ;
       d_nbr_samples_command_spread = COMMAND_SPREAD * samp_rate;
       d_nbr_samples_command_zero = COMMAND_ZERO * samp_rate;
+	  d_nbr_samples_min_symbol_time = COMMAND_MIN * samp_rate;
 
       // Welcome
       d_state = DETECTION;
@@ -97,7 +98,7 @@ namespace gr {
               }
 
               // PEAK DETECTED
-              if(in[i] > 0){
+              if(in[i] > 0 && d_nbr_samples_since_last_peak > d_nbr_samples_min_symbol_time){
                 d_command_values[d_nbr_peak_detected- 1] =/* 5 + */(d_nbr_samples_since_last_peak - d_nbr_samples_command_zero) / d_nbr_samples_command_spread;
                 d_state = CHANNEL_READING;
                 d_nbr_peak_detected++;

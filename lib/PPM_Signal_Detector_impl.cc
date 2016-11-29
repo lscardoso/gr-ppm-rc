@@ -61,7 +61,7 @@ namespace gr {
 					d_nbr_samples = 0;
 					float signal_energy = 0;
 					for(int j = 0; j < d_nbr_samples_to_process; j++)
-						signal_energy += pow(in1[i-j], 10);
+						signal_energy += pow(in1[i-j], 1);
 					(signal_energy > d_energy_threshold) ? d_bool_signal_energy = 1 : d_bool_signal_energy = 0;
 				}
 

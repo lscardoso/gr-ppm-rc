@@ -19,6 +19,7 @@ namespace gr {
       float d_nbr_samples_refreshing_display;
       float d_nbr_samples_command_spread;
       float d_nbr_samples_command_zero;
+	  float d_nbr_samples_min_symbol_time;
       float d_command_values[MAX_NBR_CHANNELS + 1];
 
      public:

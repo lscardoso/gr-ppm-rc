@@ -186,14 +186,14 @@ class ui(tk.Frame):
         self.calling = calling
 
     def createWidgets(self):
-        self.frameOptions = tk.Frame()
-        self.frameSate = tk.Frame()
+        #self.frameOptions = tk.Frame()
+        #self.frameSate = tk.Frame()
 
-        self.freqLabel = tk.Label(self.frameSate)
+        self.freqLabel = tk.Label()
         self.freqLabel.grid()
-        self.detectedLabel = tk.Label(self.frameSate, text=" Sweeping... ")
+        self.detectedLabel = tk.Label(text=" Sweeping... ")
         self.detectedLabel.grid()
-        self.channelInfoLabel = tk.Label(self.frameSate, text="  No channels  ")
+        self.channelInfoLabel = tk.Label(text="  No channels  ")
         self.channelInfoLabel.grid()
         self.freqLabel.bind_all('<KeyPress-Return>', self._enterHandler)
         self.freqLabel.bind_all('<KeyPress-Escape>', self._escapeHandler)
