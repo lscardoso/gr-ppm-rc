@@ -1,14 +1,20 @@
 <block>
   <name>PPM Peak Detector</name>
   <key>PPM_Analog_RC_PPM_Peak_Detector</key>
-  <category>PPM_ANALOG_RC</category>
+  <category>[PPM_ANALOG_RC]</category>
   <import>import PPM_Analog_RC</import>
-  <make>PPM_Analog_RC.PPM_Peak_Detector($peak_threshold)</make>
+  <make>PPM_Analog_RC.PPM_Peak_Detector($peak_threshold,$samp_rate)</make>
   <param>
     <name>Peak Threshold</name>
     <key>peak_threshold</key>
     <value>0.0</value>
     <type>float</type>
+  </param>
+  <param>
+    <name>Sample Rate</name>
+    <key>samp_rate</key>
+    <value>samp_rate</value>
+    <type>int</type>
   </param>
   <sink>
     <name>in</name>

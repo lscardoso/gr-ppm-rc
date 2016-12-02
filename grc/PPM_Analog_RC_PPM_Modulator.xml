@@ -1,7 +1,7 @@
 <block>
   <name>PPM Modulator</name>
   <key>PPM_Analog_RC_PPM_Modulator</key>
-  <category>PPM_ANALOG_RC</category>
+  <category>[PPM_ANALOG_RC]</category>
   <import>import PPM_Analog_RC</import>
   <make>PPM_Analog_RC.PPM_Modulator($samp_rate)</make>
   <param>

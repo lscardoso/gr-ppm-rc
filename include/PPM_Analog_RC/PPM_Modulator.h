@@ -44,17 +44,14 @@ namespace gr {
        * To avoid accidental use of raw pointers, PPM_Analog_RC::PPM_Modulator's
        * constructor is in a private implementation
        * class. PPM_Analog_RC::PPM_Modulator::make is the public interface for
-       * creating new instances.
        */
       static sptr make(float samp_rate);
 
       /*!
-       * \brief Set the given axis to the given value
+       * Set the given axis to the given value
        *
        * The axis number is an array index so first value is one
        * The value should be between -1.0 and 1.0
-       *
-       *
        */
       virtual void set_axis(int axis_nbr, float value) = 0;
     };

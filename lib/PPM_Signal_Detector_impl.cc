@@ -20,7 +20,7 @@ namespace gr {
 		: gr::block("PPM_Signal_Detector",
 			gr::io_signature::make(2, 2, sizeof(float)),
 			gr::io_signature::make(1, 1, sizeof(float)))
-		{	
+		{
 			d_nbr_samples = 0;
 			d_samp_rate = samp_rate;
 			d_nbr_samples_to_process = 0.001 * samp_rate;
@@ -46,18 +46,18 @@ namespace gr {
 		{
 			const float *in = (const float *) input_items[0];
 			const float *in1 = (const float *) input_items[1];
-			float *out = (float *) output_items[0];			
-			in += d_nbr_samples_to_process - 1;			
-			in1 += d_nbr_samples_to_process - 1;			
+			float *out = (float *) output_items[0];
+			in += d_nbr_samples_to_process - 1;
+			in1 += d_nbr_samples_to_process - 1;
 
 
 			for(int i = 0; i < noutput_items; i++){
 				out[i] = out[i - 1];
 				d_nbr_samples++;
-				
+
 
 				// TEST ENERGY EVERY 1MS
-				if(d_nbr_samples % d_nbr_samples_to_process == 0){ 
+				if(d_nbr_samples % d_nbr_samples_to_process == 0){
 					d_nbr_samples = 0;
 					float signal_energy = 0;
 					for(int j = 0; j < d_nbr_samples_to_process; j++)
@@ -66,9 +66,11 @@ namespace gr {
 				}
 
 
-				(in[i] > 0.03) ? d_time_constant = 0 : d_time_constant++;
+				// TEST GUARD TIME
+				(in[i] > 0.025) ? d_time_constant = 0 : d_time_constant++;
 				(d_time_constant > d_max_time_constant) ? d_max_time_constant = d_time_constant : 1;
 				(d_max_time_constant / d_samp_rate > GUARD_TIME_MIN && d_max_time_constant / d_samp_rate < GUARD_TIME_MAX) ? d_bool_guard_time = 1 : d_bool_guard_time = 0;
+
 
 				// OUTPUT
 				if(d_bool_signal_energy && d_bool_guard_time){
@@ -78,11 +80,10 @@ namespace gr {
 					d_max_time_constant = 0;
 				}
 
-				
+
 			}
 			consume_each (noutput_items);
 			return noutput_items;
 		}
   } /* namespace PPM_Analog_RC */
 } /* namespace gr */
-

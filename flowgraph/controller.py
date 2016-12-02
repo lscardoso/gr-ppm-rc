@@ -119,7 +119,7 @@ class controller(gr.basic_block):  # other base classes are basic_block, decim_b
 
 
         #Actual check if signal is detected by the signal detector block
-        if(obj.probing_block.level() >=1):
+        if(obj.probing_block.level() >=1 or obj.probing_block_energy.level() >=1):
             if self.found_last[0] is True:      #To smooth burst of false results
                 if self.found_last[1] is False: #To act only if we just arrived on this channel
                     self.window.detectedLabel.config(text='''Signal detected: press esc to continue sweep
@@ -157,11 +157,20 @@ press enter to switch to transmittion mode (not implemented yet)''')
         if self.decode == True:
             channelValues = obj.PPM_Demodulator.get_channels()
             nbChannels = obj.PPM_Demodulator.get_nbr_channels()
-            string = str(nbChannels) + " channels detected: "
+            string = str(nbChannels) + " channels detected with FM demod: "
             if nbChannels > 0:
                 for i in xrange(1,nbChannels+1):
                     string = string + "CH" + str(i) + ": " + '{:03.2f}'.format(PPM_Analog_RC.floatArray_getitem(channelValues, index=(i-1))) + " | "
             self.window.channelInfoLabel.config(text = string)
+
+            channelValues = obj.PPM_Demodulator_energy.get_channels()
+            nbChannels = obj.PPM_Demodulator_energy.get_nbr_channels()
+            string = str(nbChannels) + " channels detected with energy measurement: "
+            if nbChannels > 0:
+                for i in xrange(1,nbChannels+1):
+                    string = string + "CH" + str(i) + ": " + '{:03.2f}'.format(PPM_Analog_RC.floatArray_getitem(channelValues, index=(i-1))) + " | "
+            self.window.channelInfoLabelEnergy.config(text = string)
+
 
 
     #Not in use
@@ -180,7 +189,7 @@ press enter to switch to transmittion mode (not implemented yet)''')
 class ui(tk.Frame):
     def __init__(self, calling, master=None):
         tk.Frame.__init__(self, master)
-        self.config(height = 100, width = 500)
+        self.config(height = 100, width = 1500)
         self.grid()
         self.createWidgets()
         self.calling = calling
@@ -195,6 +204,8 @@ class ui(tk.Frame):
         self.detectedLabel.grid()
         self.channelInfoLabel = tk.Label(text="  No channels  ")
         self.channelInfoLabel.grid()
+        self.channelInfoLabelEnergy = tk.Label(text="  No channels  ")
+        self.channelInfoLabelEnergy.grid()
         self.freqLabel.bind_all('<KeyPress-Return>', self._enterHandler)
         self.freqLabel.bind_all('<KeyPress-Escape>', self._escapeHandler)
 

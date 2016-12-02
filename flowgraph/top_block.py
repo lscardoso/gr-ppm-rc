@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Top Block
-# Generated: Tue Nov 29 17:56:22 2016
+# Generated: Fri Dec  2 18:31:02 2016
 ##################################################
 
 if __name__ == '__main__':
@@ -64,7 +64,7 @@ class top_block(gr.top_block, Qt.QWidget):
         ##################################################
         # Variables
         ##################################################
-        self.Config_values = Config_values = struct({'LowFreqBoundary': 41.200e6 , 'HighFreqBoundary': 41.200e6, 'ChannelWidth': 10e3, 'SampRate': 400e3, 'TransmissionSampRate': 500e3, 'Multiplied': -1, 'Added': 0.02, })
+        self.Config_values = Config_values = struct({'LowFreqBoundary': 72.010e6 , 'HighFreqBoundary': 72.300e6, 'ChannelWidth': 20e3, 'SampRate': 400e3, 'TransmissionSampRate': 500e3, 'Multiplied': -1, 'Added': 0.02, })
         self.refresh_ui = refresh_ui = 1
         self.is_demod_on = is_demod_on = 0
         self.frequency_carrier = frequency_carrier = Config_values.LowFreqBoundary
@@ -73,7 +73,20 @@ class top_block(gr.top_block, Qt.QWidget):
         ##################################################
         # Blocks
         ##################################################
+        self.tab = Qt.QTabWidget()
+        self.tab_widget_0 = Qt.QWidget()
+        self.tab_layout_0 = Qt.QBoxLayout(Qt.QBoxLayout.TopToBottom, self.tab_widget_0)
+        self.tab_grid_layout_0 = Qt.QGridLayout()
+        self.tab_layout_0.addLayout(self.tab_grid_layout_0)
+        self.tab.addTab(self.tab_widget_0, 'FM')
+        self.tab_widget_1 = Qt.QWidget()
+        self.tab_layout_1 = Qt.QBoxLayout(Qt.QBoxLayout.TopToBottom, self.tab_widget_1)
+        self.tab_grid_layout_1 = Qt.QGridLayout()
+        self.tab_layout_1.addLayout(self.tab_grid_layout_1)
+        self.tab.addTab(self.tab_widget_1, 'Energy')
+        self.top_layout.addWidget(self.tab)
         self.controller = controller.controller(low_freq_boundary=Config_values.LowFreqBoundary, high_freq_boundary=Config_values.HighFreqBoundary, channel_width=Config_values.ChannelWidth)
+        self.PPM_Demodulator = PPM_Analog_RC.PPM_Demodulator(Config_values.SampRate, is_demod_on)
         self.variable_qtgui_range_00 = blocks.multiply_const_vff((0.5, ))
         self.uhd_usrp_source_0 = uhd.usrp_source(
         	",".join(("", "")),
@@ -85,7 +98,7 @@ class top_block(gr.top_block, Qt.QWidget):
         self.uhd_usrp_source_0.set_samp_rate(1e6)
         self.uhd_usrp_source_0.set_center_freq(frequency_carrier, 0)
         self.uhd_usrp_source_0.set_gain(1, 0)
-        self.uhd_usrp_source_0.set_antenna('RX2', 0)
+        self.uhd_usrp_source_0.set_antenna('TX/RX', 0)
         self.uhd_usrp_sink = uhd.usrp_sink(
         	",".join(("", "")),
         	uhd.stream_args(
@@ -112,6 +125,128 @@ class top_block(gr.top_block, Qt.QWidget):
         _refresh_ui_thread.daemon = True
         _refresh_ui_thread.start()
             
+        self.qtgui_waterfall_sink_x_0_0 = qtgui.waterfall_sink_c(
+        	1024, #size
+        	firdes.WIN_BLACKMAN_hARRIS, #wintype
+        	0, #fc
+        	Config_values.SampRate, #bw
+        	"", #name
+                1 #number of inputs
+        )
+        self.qtgui_waterfall_sink_x_0_0.set_update_time(0.10)
+        self.qtgui_waterfall_sink_x_0_0.enable_grid(False)
+        self.qtgui_waterfall_sink_x_0_0.enable_axis_labels(True)
+        
+        if not True:
+          self.qtgui_waterfall_sink_x_0_0.disable_legend()
+        
+        if "complex" == "float" or "complex" == "msg_float":
+          self.qtgui_waterfall_sink_x_0_0.set_plot_pos_half(not True)
+        
+        labels = ['', '', '', '', '',
+                  '', '', '', '', '']
+        colors = [0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0]
+        alphas = [1.0, 1.0, 1.0, 1.0, 1.0,
+                  1.0, 1.0, 1.0, 1.0, 1.0]
+        for i in xrange(1):
+            if len(labels[i]) == 0:
+                self.qtgui_waterfall_sink_x_0_0.set_line_label(i, "Data {0}".format(i))
+            else:
+                self.qtgui_waterfall_sink_x_0_0.set_line_label(i, labels[i])
+            self.qtgui_waterfall_sink_x_0_0.set_color_map(i, colors[i])
+            self.qtgui_waterfall_sink_x_0_0.set_line_alpha(i, alphas[i])
+        
+        self.qtgui_waterfall_sink_x_0_0.set_intensity_range(-140, 10)
+        
+        self._qtgui_waterfall_sink_x_0_0_win = sip.wrapinstance(self.qtgui_waterfall_sink_x_0_0.pyqwidget(), Qt.QWidget)
+        self.tab_layout_1.addWidget(self._qtgui_waterfall_sink_x_0_0_win)
+        self.qtgui_waterfall_sink_x_0 = qtgui.waterfall_sink_c(
+        	1024, #size
+        	firdes.WIN_BLACKMAN_hARRIS, #wintype
+        	0, #fc
+        	Config_values.SampRate, #bw
+        	"", #name
+                1 #number of inputs
+        )
+        self.qtgui_waterfall_sink_x_0.set_update_time(0.10)
+        self.qtgui_waterfall_sink_x_0.enable_grid(False)
+        self.qtgui_waterfall_sink_x_0.enable_axis_labels(True)
+        
+        if not True:
+          self.qtgui_waterfall_sink_x_0.disable_legend()
+        
+        if "complex" == "float" or "complex" == "msg_float":
+          self.qtgui_waterfall_sink_x_0.set_plot_pos_half(not True)
+        
+        labels = ['', '', '', '', '',
+                  '', '', '', '', '']
+        colors = [0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0]
+        alphas = [1.0, 1.0, 1.0, 1.0, 1.0,
+                  1.0, 1.0, 1.0, 1.0, 1.0]
+        for i in xrange(1):
+            if len(labels[i]) == 0:
+                self.qtgui_waterfall_sink_x_0.set_line_label(i, "Data {0}".format(i))
+            else:
+                self.qtgui_waterfall_sink_x_0.set_line_label(i, labels[i])
+            self.qtgui_waterfall_sink_x_0.set_color_map(i, colors[i])
+            self.qtgui_waterfall_sink_x_0.set_line_alpha(i, alphas[i])
+        
+        self.qtgui_waterfall_sink_x_0.set_intensity_range(-140, 10)
+        
+        self._qtgui_waterfall_sink_x_0_win = sip.wrapinstance(self.qtgui_waterfall_sink_x_0.pyqwidget(), Qt.QWidget)
+        self.tab_layout_0.addWidget(self._qtgui_waterfall_sink_x_0_win)
+        self.qtgui_time_sink_x_2_0_0 = qtgui.time_sink_c(
+        	10240, #size
+        	Config_values.SampRate, #samp_rate
+        	"Post AGC", #name
+        	1 #number of inputs
+        )
+        self.qtgui_time_sink_x_2_0_0.set_update_time(0.10)
+        self.qtgui_time_sink_x_2_0_0.set_y_axis(-1, 1)
+        
+        self.qtgui_time_sink_x_2_0_0.set_y_label('Amplitude', "")
+        
+        self.qtgui_time_sink_x_2_0_0.enable_tags(-1, True)
+        self.qtgui_time_sink_x_2_0_0.set_trigger_mode(qtgui.TRIG_MODE_FREE, qtgui.TRIG_SLOPE_POS, 0.0, 0, 0, "")
+        self.qtgui_time_sink_x_2_0_0.enable_autoscale(False)
+        self.qtgui_time_sink_x_2_0_0.enable_grid(False)
+        self.qtgui_time_sink_x_2_0_0.enable_axis_labels(True)
+        self.qtgui_time_sink_x_2_0_0.enable_control_panel(False)
+        
+        if not True:
+          self.qtgui_time_sink_x_2_0_0.disable_legend()
+        
+        labels = ['', '', '', '', '',
+                  '', '', '', '', '']
+        widths = [1, 1, 1, 1, 1,
+                  1, 1, 1, 1, 1]
+        colors = ["blue", "red", "green", "black", "cyan",
+                  "magenta", "yellow", "dark red", "dark green", "blue"]
+        styles = [1, 1, 1, 1, 1,
+                  1, 1, 1, 1, 1]
+        markers = [-1, -1, -1, -1, -1,
+                   -1, -1, -1, -1, -1]
+        alphas = [1.0, 1.0, 1.0, 1.0, 1.0,
+                  1.0, 1.0, 1.0, 1.0, 1.0]
+        
+        for i in xrange(2*1):
+            if len(labels[i]) == 0:
+                if(i % 2 == 0):
+                    self.qtgui_time_sink_x_2_0_0.set_line_label(i, "Re{{Data {0}}}".format(i/2))
+                else:
+                    self.qtgui_time_sink_x_2_0_0.set_line_label(i, "Im{{Data {0}}}".format(i/2))
+            else:
+                self.qtgui_time_sink_x_2_0_0.set_line_label(i, labels[i])
+            self.qtgui_time_sink_x_2_0_0.set_line_width(i, widths[i])
+            self.qtgui_time_sink_x_2_0_0.set_line_color(i, colors[i])
+            self.qtgui_time_sink_x_2_0_0.set_line_style(i, styles[i])
+            self.qtgui_time_sink_x_2_0_0.set_line_marker(i, markers[i])
+            self.qtgui_time_sink_x_2_0_0.set_line_alpha(i, alphas[i])
+        
+        self._qtgui_time_sink_x_2_0_0_win = sip.wrapinstance(self.qtgui_time_sink_x_2_0_0.pyqwidget(), Qt.QWidget)
+        self.tab_layout_1.addWidget(self._qtgui_time_sink_x_2_0_0_win)
         self.qtgui_time_sink_x_2_0 = qtgui.time_sink_c(
         	10240, #size
         	Config_values.SampRate, #samp_rate
@@ -161,7 +296,54 @@ class top_block(gr.top_block, Qt.QWidget):
             self.qtgui_time_sink_x_2_0.set_line_alpha(i, alphas[i])
         
         self._qtgui_time_sink_x_2_0_win = sip.wrapinstance(self.qtgui_time_sink_x_2_0.pyqwidget(), Qt.QWidget)
-        self.top_layout.addWidget(self._qtgui_time_sink_x_2_0_win)
+        self.tab_layout_0.addWidget(self._qtgui_time_sink_x_2_0_win)
+        self.qtgui_time_sink_x_0_0 = qtgui.time_sink_f(
+        	40240, #size
+        	Config_values.SampRate, #samp_rate
+        	"Peaks", #name
+        	3 #number of inputs
+        )
+        self.qtgui_time_sink_x_0_0.set_update_time(0.10)
+        self.qtgui_time_sink_x_0_0.set_y_axis(-1, 1)
+        
+        self.qtgui_time_sink_x_0_0.set_y_label('Amplitude', "")
+        
+        self.qtgui_time_sink_x_0_0.enable_tags(-1, True)
+        self.qtgui_time_sink_x_0_0.set_trigger_mode(qtgui.TRIG_MODE_NORM, qtgui.TRIG_SLOPE_POS, 0.5, 0.02, 0, "")
+        self.qtgui_time_sink_x_0_0.enable_autoscale(False)
+        self.qtgui_time_sink_x_0_0.enable_grid(False)
+        self.qtgui_time_sink_x_0_0.enable_axis_labels(True)
+        self.qtgui_time_sink_x_0_0.enable_control_panel(False)
+        
+        if not True:
+          self.qtgui_time_sink_x_0_0.disable_legend()
+        
+        labels = ['', '', '', '', '',
+                  '', '', '', '', '']
+        widths = [1, 1, 1, 1, 1,
+                  1, 1, 1, 1, 1]
+        colors = ["blue", "red", "green", "black", "cyan",
+                  "magenta", "yellow", "dark red", "dark green", "blue"]
+        styles = [1, 1, 1, 1, 1,
+                  1, 1, 1, 1, 1]
+        markers = [-1, -1, -1, -1, -1,
+                   -1, -1, -1, -1, -1]
+        alphas = [1.0, 1.0, 1.0, 1.0, 1.0,
+                  1.0, 1.0, 1.0, 1.0, 1.0]
+        
+        for i in xrange(3):
+            if len(labels[i]) == 0:
+                self.qtgui_time_sink_x_0_0.set_line_label(i, "Data {0}".format(i))
+            else:
+                self.qtgui_time_sink_x_0_0.set_line_label(i, labels[i])
+            self.qtgui_time_sink_x_0_0.set_line_width(i, widths[i])
+            self.qtgui_time_sink_x_0_0.set_line_color(i, colors[i])
+            self.qtgui_time_sink_x_0_0.set_line_style(i, styles[i])
+            self.qtgui_time_sink_x_0_0.set_line_marker(i, markers[i])
+            self.qtgui_time_sink_x_0_0.set_line_alpha(i, alphas[i])
+        
+        self._qtgui_time_sink_x_0_0_win = sip.wrapinstance(self.qtgui_time_sink_x_0_0.pyqwidget(), Qt.QWidget)
+        self.tab_layout_0.addWidget(self._qtgui_time_sink_x_0_0_win)
         self.qtgui_time_sink_x_0 = qtgui.time_sink_f(
         	40240, #size
         	Config_values.SampRate, #samp_rate
@@ -174,7 +356,7 @@ class top_block(gr.top_block, Qt.QWidget):
         self.qtgui_time_sink_x_0.set_y_label('Amplitude', "")
         
         self.qtgui_time_sink_x_0.enable_tags(-1, True)
-        self.qtgui_time_sink_x_0.set_trigger_mode(qtgui.TRIG_MODE_FREE, qtgui.TRIG_SLOPE_POS, 0.0, 0, 0, "")
+        self.qtgui_time_sink_x_0.set_trigger_mode(qtgui.TRIG_MODE_NORM, qtgui.TRIG_SLOPE_POS, 0.5, 0.02, 0, "")
         self.qtgui_time_sink_x_0.enable_autoscale(False)
         self.qtgui_time_sink_x_0.enable_grid(False)
         self.qtgui_time_sink_x_0.enable_axis_labels(True)
@@ -208,12 +390,16 @@ class top_block(gr.top_block, Qt.QWidget):
             self.qtgui_time_sink_x_0.set_line_alpha(i, alphas[i])
         
         self._qtgui_time_sink_x_0_win = sip.wrapinstance(self.qtgui_time_sink_x_0.pyqwidget(), Qt.QWidget)
-        self.top_layout.addWidget(self._qtgui_time_sink_x_0_win)
+        self.tab_layout_1.addWidget(self._qtgui_time_sink_x_0_win)
+        self.probing_block_energy = blocks.probe_signal_f()
         self.probing_block = blocks.probe_signal_f()
         self.multiply_const_transmitter = blocks.multiply_const_vff((Config_values.Multiplied, ))
+        self.moving_average_0 = blocks.moving_average_ff(int(Config_values.SampRate*0.04), 1.0/(int(Config_values.SampRate*0.04)), 4000)
         self.moving_average = blocks.moving_average_ff(int(Config_values.SampRate*0.04), 1.0/(int(Config_values.SampRate*0.04)), 4000)
         self.low_pass_filter_transmitter = filter.fir_filter_fff(1, firdes.low_pass(
         	1, Config_values.TransmissionSampRate, 1e3, 8e3, firdes.WIN_HANN, 6.76))
+        self.low_pass_filter_1 = filter.fir_filter_fff(1, firdes.low_pass(
+        	1, Config_values.SampRate, 3e3, 1e3, firdes.WIN_HAMMING, 6.76))
         self.low_pass_filter_0 = filter.fir_filter_ccf(1, firdes.low_pass(
         	1, Config_values.SampRate, Config_values.ChannelWidth-(Config_values.ChannelWidth/7), Config_values.ChannelWidth/20, firdes.WIN_HAMMING, 6.76))
         self.fractional_resampler_xx_0 = filter.fractional_resampler_cc(0, 1000000/Config_values.SampRate)
@@ -231,43 +417,71 @@ class top_block(gr.top_block, Qt.QWidget):
         _controller_callback_thread.start()
             
         self.blocks_vco_c_0 = blocks.vco_c(Config_values.TransmissionSampRate, 100000, 1)
+        self.blocks_sub_xx_0_0 = blocks.sub_ff(1)
         self.blocks_sub_xx_0 = blocks.sub_ff(1)
+        self.blocks_multiply_const_vxx_0_0 = blocks.multiply_const_vff((-1, ))
         self.blocks_multiply_const_vxx_0 = blocks.multiply_const_vff((-1, ))
         self.blocks_complex_to_mag_squared_0 = blocks.complex_to_mag_squared(1)
+        self.analog_wfm_rcv_0 = analog.wfm_rcv(
+        	quad_rate=Config_values.ChannelWidth,
+        	audio_decimation=1,
+        )
+        self.analog_agc2_xx_0_0_0 = analog.agc2_ff(100, 1000, 1.2, 1000.0)
+        self.analog_agc2_xx_0_0_0.set_max_gain(0)
         self.analog_agc2_xx_0_0 = analog.agc2_ff(1, 10, 1.2, 1.0)
         self.analog_agc2_xx_0_0.set_max_gain(0)
         self.analog_agc2_xx_0 = analog.agc2_cc(1e-1, 1e-0, 1.0, 1.0)
         self.analog_agc2_xx_0.set_max_gain(65536)
         self.add_const_transmitter = blocks.add_const_vff((Config_values.Added, ))
         self.PPM_Modulator = PPM_Analog_RC.PPM_Modulator(Config_values.TransmissionSampRate)
-        self.PPM_Demodulator = PPM_Analog_RC.PPM_Demodulator(Config_values.SampRate, is_demod_on)
-        self.PPM_Analog_RC_PPM_Signal_Detector_0 = PPM_Analog_RC.PPM_Signal_Detector(Config_values.SampRate, 1e-14)
-        self.PPM_Analog_RC_PPM_Peak_Detector_0 = PPM_Analog_RC.PPM_Peak_Detector(0.9)
+        self.PPM_Demodulator_energy = PPM_Analog_RC.PPM_Demodulator(Config_values.SampRate, is_demod_on)
+        self.PPM_Analog_RC_PPM_Signal_Detector_0_0 = PPM_Analog_RC.PPM_Signal_Detector(Config_values.SampRate, 1e-6)
+        self.PPM_Analog_RC_PPM_Signal_Detector_0 = PPM_Analog_RC.PPM_Signal_Detector(Config_values.SampRate, 1e-6)
+        self.PPM_Analog_RC_PPM_Peak_Detector_1_0 = PPM_Analog_RC.PPM_Peak_Detector(125,int(Config_values.SampRate))
+        self.PPM_Analog_RC_PPM_Peak_Detector_1 = PPM_Analog_RC.PPM_Peak_Detector(30,int(Config_values.SampRate))
 
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.PPM_Analog_RC_PPM_Peak_Detector_0, 0), (self.PPM_Analog_RC_PPM_Signal_Detector_0, 0))    
-        self.connect((self.PPM_Analog_RC_PPM_Peak_Detector_0, 0), (self.PPM_Demodulator, 0))    
-        self.connect((self.PPM_Analog_RC_PPM_Peak_Detector_0, 0), (self.qtgui_time_sink_x_0, 0))    
+        self.connect((self.PPM_Analog_RC_PPM_Peak_Detector_1, 0), (self.PPM_Analog_RC_PPM_Signal_Detector_0, 0))    
+        self.connect((self.PPM_Analog_RC_PPM_Peak_Detector_1, 0), (self.PPM_Demodulator, 0))    
+        self.connect((self.PPM_Analog_RC_PPM_Peak_Detector_1, 0), (self.qtgui_time_sink_x_0_0, 0))    
+        self.connect((self.PPM_Analog_RC_PPM_Peak_Detector_1_0, 0), (self.PPM_Analog_RC_PPM_Signal_Detector_0_0, 0))    
+        self.connect((self.PPM_Analog_RC_PPM_Peak_Detector_1_0, 0), (self.PPM_Demodulator_energy, 0))    
+        self.connect((self.PPM_Analog_RC_PPM_Peak_Detector_1_0, 0), (self.qtgui_time_sink_x_0, 0))    
         self.connect((self.PPM_Analog_RC_PPM_Signal_Detector_0, 0), (self.probing_block, 0))    
+        self.connect((self.PPM_Analog_RC_PPM_Signal_Detector_0, 0), (self.qtgui_time_sink_x_0_0, 2))    
+        self.connect((self.PPM_Analog_RC_PPM_Signal_Detector_0_0, 0), (self.probing_block_energy, 0))    
+        self.connect((self.PPM_Analog_RC_PPM_Signal_Detector_0_0, 0), (self.qtgui_time_sink_x_0, 2))    
         self.connect((self.PPM_Modulator, 0), (self.variable_qtgui_range_00, 0))    
         self.connect((self.add_const_transmitter, 0), (self.blocks_vco_c_0, 0))    
+        self.connect((self.analog_agc2_xx_0, 0), (self.analog_wfm_rcv_0, 0))    
         self.connect((self.analog_agc2_xx_0, 0), (self.qtgui_time_sink_x_2_0, 0))    
-        self.connect((self.analog_agc2_xx_0_0, 0), (self.blocks_sub_xx_0, 0))    
-        self.connect((self.analog_agc2_xx_0_0, 0), (self.moving_average, 0))    
+        self.connect((self.analog_agc2_xx_0, 0), (self.qtgui_time_sink_x_2_0_0, 0))    
+        self.connect((self.analog_agc2_xx_0_0, 0), (self.low_pass_filter_1, 0))    
+        self.connect((self.analog_agc2_xx_0_0_0, 0), (self.blocks_sub_xx_0_0, 0))    
+        self.connect((self.analog_agc2_xx_0_0_0, 0), (self.moving_average_0, 0))    
+        self.connect((self.analog_wfm_rcv_0, 0), (self.analog_agc2_xx_0_0, 0))    
         self.connect((self.blocks_complex_to_mag_squared_0, 0), (self.PPM_Analog_RC_PPM_Signal_Detector_0, 1))    
-        self.connect((self.blocks_complex_to_mag_squared_0, 0), (self.analog_agc2_xx_0_0, 0))    
-        self.connect((self.blocks_complex_to_mag_squared_0, 0), (self.qtgui_time_sink_x_0, 2))    
-        self.connect((self.blocks_multiply_const_vxx_0, 0), (self.PPM_Analog_RC_PPM_Peak_Detector_0, 0))    
-        self.connect((self.blocks_multiply_const_vxx_0, 0), (self.qtgui_time_sink_x_0, 1))    
+        self.connect((self.blocks_complex_to_mag_squared_0, 0), (self.PPM_Analog_RC_PPM_Signal_Detector_0_0, 1))    
+        self.connect((self.blocks_complex_to_mag_squared_0, 0), (self.analog_agc2_xx_0_0_0, 0))    
+        self.connect((self.blocks_multiply_const_vxx_0, 0), (self.PPM_Analog_RC_PPM_Peak_Detector_1, 0))    
+        self.connect((self.blocks_multiply_const_vxx_0, 0), (self.qtgui_time_sink_x_0_0, 1))    
+        self.connect((self.blocks_multiply_const_vxx_0_0, 0), (self.PPM_Analog_RC_PPM_Peak_Detector_1_0, 0))    
+        self.connect((self.blocks_multiply_const_vxx_0_0, 0), (self.qtgui_time_sink_x_0, 1))    
         self.connect((self.blocks_sub_xx_0, 0), (self.blocks_multiply_const_vxx_0, 0))    
+        self.connect((self.blocks_sub_xx_0_0, 0), (self.blocks_multiply_const_vxx_0_0, 0))    
         self.connect((self.blocks_vco_c_0, 0), (self.uhd_usrp_sink, 0))    
         self.connect((self.fractional_resampler_xx_0, 0), (self.low_pass_filter_0, 0))    
+        self.connect((self.fractional_resampler_xx_0, 0), (self.qtgui_waterfall_sink_x_0, 0))    
+        self.connect((self.fractional_resampler_xx_0, 0), (self.qtgui_waterfall_sink_x_0_0, 0))    
         self.connect((self.low_pass_filter_0, 0), (self.analog_agc2_xx_0, 0))    
         self.connect((self.low_pass_filter_0, 0), (self.blocks_complex_to_mag_squared_0, 0))    
+        self.connect((self.low_pass_filter_1, 0), (self.blocks_sub_xx_0, 0))    
+        self.connect((self.low_pass_filter_1, 0), (self.moving_average, 0))    
         self.connect((self.low_pass_filter_transmitter, 0), (self.multiply_const_transmitter, 0))    
         self.connect((self.moving_average, 0), (self.blocks_sub_xx_0, 1))    
+        self.connect((self.moving_average_0, 0), (self.blocks_sub_xx_0_0, 1))    
         self.connect((self.multiply_const_transmitter, 0), (self.add_const_transmitter, 0))    
         self.connect((self.root_raised_cosine_transmitter, 0), (self.low_pass_filter_transmitter, 0))    
         self.connect((self.uhd_usrp_source_0, 0), (self.fractional_resampler_xx_0, 0))    
@@ -296,6 +510,7 @@ class top_block(gr.top_block, Qt.QWidget):
     def set_is_demod_on(self, is_demod_on):
         self.is_demod_on = is_demod_on
         self.PPM_Demodulator.set_demod_on(self.is_demod_on)
+        self.PPM_Demodulator_energy.set_demod_on(self.is_demod_on)
 
     def get_frequency_carrier(self):
         return self.frequency_carrier

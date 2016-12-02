@@ -1,7 +1,7 @@
 <block>
   <name>Ppm signal detector</name>
   <key>PPM_Analog_RC_PPM_Signal_Detector</key>
-  <category>PPM_ANALOG_RC</category>
+  <category>[PPM_ANALOG_RC]</category>
   <import>import PPM_Analog_RC</import>
   <make>PPM_Analog_RC.PPM_Signal_Detector($samp_rate, $energy_threshold)</make>
   <param>
