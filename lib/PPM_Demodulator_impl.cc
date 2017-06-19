@@ -33,7 +33,7 @@ namespace gr {
       d_nbr_peak_detected= 0;
       d_nbr_samples_since_displayed = 0;
       d_nbr_samples_since_last_peak = 0;
-      d_nbr_samples_guard_time = samp_rate * GUARD_TIME_RECEPTION;
+      d_nbr_samples_guard_time = samp_rate * (COMMAND_ZERO + COMMAND_SPREAD*2);
       d_nbr_samples_refreshing_display = samp_rate * 1.0 / 12.0 ;
       d_nbr_samples_command_spread = COMMAND_SPREAD * samp_rate;
       d_nbr_samples_command_zero = COMMAND_ZERO * samp_rate;
@@ -93,7 +93,7 @@ namespace gr {
               if(d_nbr_peak_detected>18){
                 d_state = DETECTION;
                 d_nbr_of_channels = 0;
-                printf("%s\n", "Too many peaks detected in a row ");
+                //printf("%s\n", "Too many peaks detected in a row ");
                 break;
               }
 

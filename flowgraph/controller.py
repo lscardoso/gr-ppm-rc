@@ -65,6 +65,23 @@ class controller(gr.basic_block):  # other base classes are basic_block, decim_b
         obj.disconnect((obj.add_const_transmitter, 0), (obj.blocks_vco_c_0, 0))
         obj.unlock()
 
+    def nextChannel(self,obj):
+        # Chan change
+        newfreq = obj.frequency_carrier + self.channel_width   #Loop on available channels
+        if (newfreq > self.high_freq_boundary):
+            newfreq = self.low_freq_boundary
+        obj.set_frequency_carrier(newfreq)
+        obj.set_is_demod_on(0)
+        # Ui reset
+        self.window.detectedLabel.config(text=" Sweeping... ")
+        self.window.freqLabel.config(text= "Frequency: " + str(newfreq/1000000.0) + "MHz")
+        self.window.channelInfoLabel.config(text = '')
+        self.window.channelInfoLabelEnergy.config(text = '')
+        self.found_last[0] = 0
+        self.found_last[1] = False
+        self.decode = False
+
+
 
 
     def check_signal(self, obj):
@@ -89,20 +106,11 @@ class controller(gr.basic_block):  # other base classes are basic_block, decim_b
             self.window.freqLabel.config(text= "Frequency: " + str(self.low_freq_boundary/1000000.0) + "MHz")
             return 0
 
-        #Switch to next channel
+        #Switch to next channel manually
         if self.input_key == 'escape':
             self.input_key = ''
-            newfreq = obj.frequency_carrier + self.channel_width   #Loop on available channels
-            if (newfreq > self.high_freq_boundary):
-                newfreq = self.low_freq_boundary
-            obj.set_frequency_carrier(newfreq)
-            obj.set_is_demod_on(0)
             print 'Changing channel'
-            self.window.freqLabel.config(text= "Frequency: " + str(newfreq/1000000.0) + "MHz")
-            self.window.channelInfoLabel.config(text = '')
-            self.found_last[0] = 0
-            self.found_last[1] = False
-            self.decode = False
+            self.nextChannel(obj)
             return 0
 
 
@@ -123,7 +131,7 @@ class controller(gr.basic_block):  # other base classes are basic_block, decim_b
             if self.found_last[0] is True:      #To smooth burst of false results
                 if self.found_last[1] is False: #To act only if we just arrived on this channel
                     self.window.detectedLabel.config(text='''Signal detected: press esc to continue sweep
-press enter to switch to transmittion mode (not implemented yet)''')
+Press enter to switch to transmittion mode''')
                     obj.set_is_demod_on(1)
                     self.found_last[1] = True
                     self.decode = True
@@ -133,19 +141,8 @@ press enter to switch to transmittion mode (not implemented yet)''')
                 return 0
         else :
             if self.found_last[0] is False:
-                newfreq = obj.frequency_carrier + self.channel_width   #Loop on available channels
-                if (newfreq > self.high_freq_boundary):
-                    newfreq = self.low_freq_boundary
-                obj.set_frequency_carrier(newfreq)
-                obj.set_is_demod_on(0)
-
-                self.window.detectedLabel.config(text=" Sweeping... ")
-                self.window.freqLabel.config(text= "Frequency: " + str(newfreq/1000000.0) + "MHz")
-                self.window.channelInfoLabel.config(text = '')
-                self.found_last[0] = 0
-                self.found_last[1] = False
-                self.decode = False
-                print 'Changing channel nothing found' + "  Frequency: " +str(newfreq/1000000.0) + "MHz"
+                self.nextChannel(obj)
+                print 'Changing channel nothing found'
                 return 0
             else:
                 self.found_last[0] = False
@@ -155,22 +152,27 @@ press enter to switch to transmittion mode (not implemented yet)''')
     #Refresh the ui with channel values information
     def refreshUi(self, obj):
         if self.decode == True:
-            channelValues = obj.PPM_Demodulator.get_channels()
-            nbChannels = obj.PPM_Demodulator.get_nbr_channels()
-            string = str(nbChannels) + " channels detected with FM demod: "
-            if nbChannels > 0:
-                for i in xrange(1,nbChannels+1):
-                    string = string + "CH" + str(i) + ": " + '{:03.2f}'.format(PPM_Analog_RC.floatArray_getitem(channelValues, index=(i-1))) + " | "
-            self.window.channelInfoLabel.config(text = string)
+            if obj.probing_block.level() >=1 :
+                channelValues = obj.PPM_Demodulator.get_channels()
+                nbChannels = obj.PPM_Demodulator.get_nbr_channels()
+                string = str(nbChannels) + " channels detected with FM demod: "
+                if nbChannels > 0:
+                    for i in xrange(1,nbChannels+1):
+                        string = string + "CH" + str(i) + ": " + '{:03.2f}'.format(PPM_Analog_RC.floatArray_getitem(channelValues, index=(i-1))) + " | "
+                self.window.channelInfoLabel.config(text = string)
+            else:
+                self.window.channelInfoLabel.config(text = '0 channels detected with FM demod.')
 
-            channelValues = obj.PPM_Demodulator_energy.get_channels()
-            nbChannels = obj.PPM_Demodulator_energy.get_nbr_channels()
-            string = str(nbChannels) + " channels detected with energy measurement: "
-            if nbChannels > 0:
-                for i in xrange(1,nbChannels+1):
-                    string = string + "CH" + str(i) + ": " + '{:03.2f}'.format(PPM_Analog_RC.floatArray_getitem(channelValues, index=(i-1))) + " | "
-            self.window.channelInfoLabelEnergy.config(text = string)
-
+            if obj.probing_block_energy.level() >=1 :
+                channelValues = obj.PPM_Demodulator_energy.get_channels()
+                nbChannels = obj.PPM_Demodulator_energy.get_nbr_channels()
+                string = str(nbChannels) + " channels detected with energy measurement: "
+                if nbChannels > 0:
+                    for i in xrange(1,nbChannels+1):
+                        string = string + "CH" + str(i) + ": " + '{:03.2f}'.format(PPM_Analog_RC.floatArray_getitem(channelValues, index=(i-1))) + " | "
+                self.window.channelInfoLabelEnergy.config(text = string)
+            else:
+                self.window.channelInfoLabelEnergy.config(text = '0 channels detected with FM demod.')
 
 
     #Not in use
@@ -189,7 +191,7 @@ press enter to switch to transmittion mode (not implemented yet)''')
 class ui(tk.Frame):
     def __init__(self, calling, master=None):
         tk.Frame.__init__(self, master)
-        self.config(height = 100, width = 1500)
+        self.config(height = 50, width = 500)
         self.grid()
         self.createWidgets()
         self.calling = calling
