@@ -1,6 +1,6 @@
 #ifndef INCLUDED_PPM_ANALOG_RC_PPM_DEMODULATOR_IMPL_H
 #define INCLUDED_PPM_ANALOG_RC_PPM_DEMODULATOR_IMPL_H
-#include <PPM_Analog_RC/PPM_Demodulator.h>
+#include <gnuradio/PPM_Analog_RC/PPM_Demodulator.h>
 
 #include "PPM_Configuration.h"
 

@@ -1,6 +1,6 @@
 #ifndef INCLUDED_PPM_ANALOG_RC_PPM_PEAK_DETECTOR_IMPL_H
 #define INCLUDED_PPM_ANALOG_RC_PPM_PEAK_DETECTOR_IMPL_H
-#include <PPM_Analog_RC/PPM_Peak_Detector.h>
+#include <gnuradio/PPM_Analog_RC/PPM_Peak_Detector.h>
 namespace gr {
   namespace PPM_Analog_RC {
     class PPM_Peak_Detector_impl : public PPM_Peak_Detector

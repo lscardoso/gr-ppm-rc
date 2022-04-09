@@ -1,6 +1,6 @@
 #ifndef INCLUDED_PPM_ANALOG_RC_PPM_MODULATOR_IMPL_H
 #define INCLUDED_PPM_ANALOG_RC_PPM_MODULATOR_IMPL_H
-#include <PPM_Analog_RC/PPM_Modulator.h>
+#include <gnuradio/PPM_Analog_RC/PPM_Modulator.h>
 namespace gr {
   namespace PPM_Analog_RC {
     class PPM_Modulator_impl : public PPM_Modulator
