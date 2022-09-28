@@ -21,7 +21,7 @@
 #ifndef INCLUDED_PPM_ANALOG_RC_PPM_SIGNAL_DETECTOR_IMPL_H
 #define INCLUDED_PPM_ANALOG_RC_PPM_SIGNAL_DETECTOR_IMPL_H
 
-#include <PPM_Analog_RC/PPM_Signal_Detector.h>
+#include <gnuradio/PPM_Analog_RC/PPM_Signal_Detector.h>
 
 namespace gr {
   namespace PPM_Analog_RC {
